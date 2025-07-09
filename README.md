@@ -1,39 +1,41 @@
 # 🧗‍♀️ Ascend - Climbing Session Tracker
 
-A React Native mobile application for tracking climbing sessions, built with TypeScript, Redux Toolkit, and Expo.
+A beautiful React Native mobile app for tracking climbing sessions, analyzing progress, and checking weather conditions for outdoor climbing.
 
-## Features
+## ✨ Features
 
-- **Authentication System**: Secure login/register with JWT tokens
-- **Session Management**: Create, edit, delete, and view climbing sessions
-- **Multiple Disciplines**: Support for Bouldering, Lead, and Top Rope climbing
-- **Grade Tracking**: V-scale for bouldering, YDS for lead/sport climbing
-- **Analytics Dashboard**: Progress tracking and statistics
-- **Modern UI**: Beautiful, intuitive interface with smooth animations
-- **Offline Support**: Local caching for offline viewing
+- **Session Tracking**: Log bouldering, lead, and top rope climbing sessions
+- **Grade Management**: Support for V-scale (bouldering) and YDS (lead/top rope) grading systems
+- **Progress Analytics**: Visual charts and statistics showing your climbing progress
+- **Weather Integration**: Real-time weather data and climbing condition analysis
+- **User Authentication**: Secure login/registration with JWT tokens
+- **Modern Design**: Glassmorphism effects, animated gradients, and smooth transitions
+- **Material Icons**: Professional iconography throughout the app
+- **Responsive Layout**: Optimized for both iOS and Android
 
-## Tech Stack
+## 🚀 Tech Stack
 
 - **React Native** with Expo
 - **TypeScript** for type safety
 - **Redux Toolkit** for state management
 - **React Navigation** for routing
-- **AsyncStorage** for local data persistence
-- **React Native Chart Kit** for analytics visualization
+- **Expo Linear Gradient** for beautiful gradients
+- **React Native Vector Icons** for professional icons
 
-## Prerequisites
+## 🛠️ Installation & Setup
 
+### Prerequisites
 - Node.js (v16 or higher)
 - npm or yarn
 - Expo CLI
-- iOS Simulator (for iOS development) or Android Studio (for Android development)
+- iOS Simulator or Android Emulator (optional)
 
-## Installation
+### Quick Start
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
-   cd AscendApp
+   git clone https://github.com/avemunoori/ascend.git
+   cd ascend/AscendApp
    ```
 
 2. **Install dependencies**
@@ -42,11 +44,11 @@ A React Native mobile application for tracking climbing sessions, built with Typ
    ```
 
 3. **Environment Setup**
-   Create a `.env` file in the root directory with your environment variables:
+   Create a `.env` file in the `AscendApp` directory:
    ```env
+   EXPO_PUBLIC_BACKEND_API_URL=your_backend_api_url_here
    WEATHER_API_KEY=your_weather_api_key_here
    WEATHER_API_BASE_URL=https://api.weatherapi.com/v1
-   EXPO_PUBLIC_BACKEND_API_URL=your_backend_api_url_here
    ```
 
 4. **Start the development server**
@@ -156,4 +158,4 @@ This project is licensed under the MIT License.
 
 ## Support
 
-For support, please open an issue in the GitHub repository or contact the development team. 
+For support, please open an issue in the GitHub repository or contact the development team.

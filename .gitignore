@@ -1,6 +1,4 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
-# dependencies
+# Node dependencies
 node_modules/
 
 # Expo
@@ -10,7 +8,6 @@ web-build/
 expo-env.d.ts
 
 # Native
-.kotlin/
 *.orig.*
 *.jks
 *.p8
@@ -21,18 +18,83 @@ expo-env.d.ts
 # Metro
 .metro-health-check*
 
-# debug
+# Debug/logs
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+logs
+*.log
 
 # macOS
 .DS_Store
 *.pem
 
-# local env files
+# Local env files
 .env*.local
 .env
 
-# typescript
+# TypeScript
 *.tsbuildinfo
+
+# IDE/editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+Thumbs.db
+
+# Temporary folders
+.tmp/
+tmp/
+temp/
+
+# Coverage
+coverage/
+.nyc_output
+
+# Optional npm/yarn files
+.npm
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.yarn-integrity
+.pnp.*
+
+# Misc
+.cache
+.parcel-cache
+.next
+.nuxt
+.out
+.storybook-out
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+.node_repl_history
+*.tgz
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# VSCode test
+.vscode-test
