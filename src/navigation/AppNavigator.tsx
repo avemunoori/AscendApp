@@ -17,9 +17,10 @@ import SessionsScreen from '../screens/sessions/SessionsScreen';
 import SessionDetailScreen from '../screens/sessions/SessionDetailScreen';
 import CreateSessionScreen from '../screens/sessions/CreateSessionScreen';
 import EditSessionScreen from '../screens/sessions/EditSessionScreen';
-import AnalyticsScreen from '../screens/analytics/AnalyticsScreen';
+import { AnalyticsScreen } from '../screens/analytics/AnalyticsScreen';
 import WeatherScreen from '../screens/weather/WeatherScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
+import AchievementsScreen from '../screens/profile/AchievementsScreen';
 
 // Import components
 import LoadingScreen from '../components/LoadingScreen';
@@ -91,6 +92,16 @@ const TabNavigator = () => {
           ),
         }}
       />
+      <Tab.Screen
+        name="Achievements"
+        component={AchievementsScreen}
+        options={{
+          tabBarLabel: 'Awards',
+          tabBarIcon: ({ color, size }) => (
+            <TabIcon name="trophy" color={color} size={size} />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 };
@@ -103,6 +114,7 @@ const TabIcon = ({ name, color, size }: { name: string; color: string; size: num
       case 'weather': return 'wb-sunny';
       case 'bar-chart': return 'bar-chart';
       case 'person': return 'person';
+      case 'trophy': return 'emoji-events';
       default: return 'help';
     }
   };

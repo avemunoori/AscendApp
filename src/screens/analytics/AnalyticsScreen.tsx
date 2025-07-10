@@ -1,212 +1,247 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  Animated,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchAllAnalytics } from '../../store/analyticsSlice';
-import GradientBackground from '../../components/GradientBackground';
 import GlassCard from '../../components/GlassCard';
-import { LinearGradient } from 'expo-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import GradientBackground from '../../components/GradientBackground';
+import LoadingScreen from '../../components/LoadingScreen';
 
 const { width } = Dimensions.get('window');
 
-const AnalyticsScreen = () => {
+export const AnalyticsScreen: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { analytics, statsOverview, isLoading } = useAppSelector((state) => state.analytics);
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
-  
-  // Animations
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
+  const { analytics, statsOverview, progressAnalytics, highestGrades, isLoading, error } = useAppSelector((state) => state.analytics);
+  const { user } = useAppSelector((state) => state.auth);
+  const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year'>('month');
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (user?.id) {
       dispatch(fetchAllAnalytics());
     }
-    
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [dispatch, isAuthenticated]);
+  }, [dispatch, user?.id]);
 
-  const StatCard = ({ title, value, subtitle, colors }: {
-    title: string;
-    value: string | number;
-    subtitle?: string;
-    colors: [string, string];
-  }) => (
-    <GlassCard style={styles.statCard}>
-      <LinearGradient colors={colors} style={styles.statGradient}>
-        <Text style={styles.statTitle}>{title}</Text>
-        <Text style={styles.statValue}>{value}</Text>
-        {subtitle && <Text style={styles.statSubtitle}>{subtitle}</Text>}
-      </LinearGradient>
-    </GlassCard>
-  );
-
-  const ProgressBar = ({ label, value, maxValue, color }: {
-    label: string;
-    value: number;
-    maxValue: number;
-    color: string;
-  }) => {
-    const progress = (value / maxValue) * 100;
-    
-    return (
-      <View style={styles.progressContainer}>
-        <View style={styles.progressHeader}>
-          <Text style={styles.progressLabel}>{label}</Text>
-          <Text style={styles.progressValue}>{value}/{maxValue}</Text>
-        </View>
-        <View style={styles.progressBar}>
-          <Animated.View
-            style={[
-              styles.progressFill,
-              {
-                width: `${progress}%`,
-                backgroundColor: color,
-              },
-            ]}
-          />
-        </View>
-      </View>
-    );
+  const handlePeriodChange = (period: 'week' | 'month' | 'year') => {
+    setSelectedPeriod(period);
   };
+
+  const formatNumber = (num: number): string => {
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'k';
+    }
+    return num.toString();
+  };
+
+  const getGradeColor = (grade: string): string => {
+    const gradeColors: { [key: string]: string } = {
+      '5.6': '#4CAF50',
+      '5.7': '#8BC34A',
+      '5.8': '#CDDC39',
+      '5.9': '#FFEB3B',
+      '5.10a': '#FF9800',
+      '5.10b': '#FF9800',
+      '5.10c': '#FF9800',
+      '5.10d': '#FF9800',
+      '5.11a': '#F44336',
+      '5.11b': '#F44336',
+      '5.11c': '#F44336',
+      '5.11d': '#F44336',
+      '5.12a': '#9C27B0',
+      '5.12b': '#9C27B0',
+      '5.12c': '#9C27B0',
+      '5.12d': '#9C27B0',
+      '5.13a': '#3F51B5',
+      '5.13b': '#3F51B5',
+      '5.13c': '#3F51B5',
+      '5.13d': '#3F51B5',
+      '5.14a': '#000000',
+      '5.14b': '#000000',
+      '5.14c': '#000000',
+      '5.14d': '#000000',
+    };
+    return gradeColors[grade] || '#666666';
+  };
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
+  if (error) {
+    return (
+      <GradientBackground>
+        <View style={styles.container}>
+          <GlassCard style={styles.errorCard}>
+            <Text style={styles.errorText}>Error loading analytics: {error}</Text>
+            <TouchableOpacity
+              style={styles.retryButton}
+              onPress={() => user?.id && dispatch(fetchAllAnalytics())}
+            >
+              <Text style={styles.retryButtonText}>Retry</Text>
+            </TouchableOpacity>
+          </GlassCard>
+        </View>
+      </GradientBackground>
+    );
+  }
+
+  if (!analytics && !statsOverview) {
+    return (
+      <GradientBackground>
+        <View style={styles.container}>
+          <GlassCard style={styles.emptyCard}>
+            <Text style={styles.emptyText}>No analytics data available</Text>
+          </GlassCard>
+        </View>
+      </GradientBackground>
+    );
+  }
 
   return (
     <GradientBackground>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <Animated.View
-          style={[
-            styles.content,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }],
-            },
-          ]}
-        >
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.title}>Analytics Dashboard</Text>
-            <Text style={styles.subtitle}>Track your climbing progress</Text>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Analytics</Text>
+          <Text style={styles.subtitle}>Track your climbing progress</Text>
+        </View>
+
+        {/* Period Selector */}
+        <GlassCard style={styles.periodCard}>
+          <View style={styles.periodSelector}>
+            {(['week', 'month', 'year'] as const).map((period) => (
+              <TouchableOpacity
+                key={period}
+                style={[
+                  styles.periodButton,
+                  selectedPeriod === period && styles.periodButtonActive,
+                ]}
+                onPress={() => handlePeriodChange(period)}
+              >
+                <Text
+                  style={[
+                    styles.periodButtonText,
+                    selectedPeriod === period && styles.periodButtonTextActive,
+                  ]}
+                >
+                  {period.charAt(0).toUpperCase() + period.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
+        </GlassCard>
 
-          {/* Stats Overview */}
-          {statsOverview && (
-            <View style={styles.statsGrid}>
-              <StatCard
-                title="Total Sessions"
-                value={statsOverview.totalSessions}
-                colors={['#6366f1', '#4f46e5']}
-              />
-              <StatCard
-                title="Sent Rate"
-                value={`${statsOverview.sentPercentage.toFixed(1)}%`}
-                colors={['#10b981', '#059669']}
-              />
-              <StatCard
-                title="Avg Difficulty"
-                value={statsOverview.averageDifficulty.toFixed(1)}
-                colors={['#f59e0b', '#d97706']}
-              />
-              <StatCard
-                title="Bouldering"
-                value={statsOverview.sessionsByDiscipline?.BOULDER || 0}
-                colors={['#ef4444', '#dc2626']}
-              />
-            </View>
-          )}
-
-          {/* Session Analytics */}
-          {analytics && (
-            <GlassCard style={styles.analyticsCard}>
-              <Text style={styles.cardTitle}>Session Overview</Text>
-              
-              <View style={styles.analyticsGrid}>
-                <View style={styles.analyticsItem}>
-                  <Text style={styles.analyticsLabel}>Sent Rate</Text>
-                  <Text style={styles.analyticsValue}>
-                    {analytics.sentPercentage.toFixed(1)}%
-                  </Text>
-                </View>
-                
-                <View style={styles.analyticsItem}>
-                  <Text style={styles.analyticsLabel}>Avg Difficulty</Text>
-                  <Text style={styles.analyticsValue}>
-                    {analytics.averageDifficulty.toFixed(1)}
-                  </Text>
-                </View>
-              </View>
-
-              <ProgressBar
-                label="Sent Sessions"
-                value={Math.round(analytics.totalSessions * analytics.sentPercentage / 100)}
-                maxValue={analytics.totalSessions}
-                color="#10b981"
-              />
-              
-              <ProgressBar
-                label="Bouldering Sessions"
-                value={analytics.sessionsByDiscipline?.BOULDER || 0}
-                maxValue={analytics.totalSessions}
-                color="#6366f1"
-              />
-            </GlassCard>
-          )}
-
-          {/* Quick Stats */}
-          <GlassCard style={styles.quickStatsCard}>
-            <Text style={styles.cardTitle}>Quick Stats</Text>
-            
-            <View style={styles.quickStatsGrid}>
-              <View style={styles.quickStat}>
-                <Icon name="fitness-center" size={24} color="#6366f1" />
-                <Text style={styles.quickStatLabel}>Bouldering</Text>
-                <Text style={styles.quickStatValue}>12 sessions</Text>
-              </View>
-              
-              <View style={styles.quickStat}>
-                <Icon name="trending-up" size={24} color="#10b981" />
-                <Text style={styles.quickStatLabel}>Lead</Text>
-                <Text style={styles.quickStatValue}>8 sessions</Text>
-              </View>
-              
-              <View style={styles.quickStat}>
-                <Icon name="flag" size={24} color="#f59e0b" />
-                <Text style={styles.quickStatLabel}>Top Rope</Text>
-                <Text style={styles.quickStatValue}>5 sessions</Text>
-              </View>
-            </View>
+        {/* Key Stats */}
+        <View style={styles.statsGrid}>
+          <GlassCard style={styles.statCard}>
+            <Text style={styles.statValue}>{formatNumber(statsOverview?.totalSessions || analytics?.totalSessions || 0)}</Text>
+            <Text style={styles.statLabel}>Total Sessions</Text>
           </GlassCard>
-
-          {/* Motivation Card */}
-          <GlassCard style={styles.motivationCard}>
-            <LinearGradient
-              colors={['#667eea', '#764ba2']}
-              style={styles.motivationGradient}
-            >
-              <Text style={styles.motivationTitle}>Keep Climbing!</Text>
-              <Text style={styles.motivationText}>
-                Every session brings you closer to your goals. Stay consistent and watch your progress soar!
-              </Text>
-            </LinearGradient>
+          
+          <GlassCard style={styles.statCard}>
+            <Text style={styles.statValue}>{(statsOverview?.averageDifficulty || analytics?.averageDifficulty || 0).toFixed(1)}</Text>
+            <Text style={styles.statLabel}>Avg Difficulty</Text>
           </GlassCard>
-        </Animated.View>
+          
+          <GlassCard style={styles.statCard}>
+            <Text style={styles.statValue}>{(statsOverview?.sentPercentage || analytics?.sentPercentage || 0).toFixed(1)}%</Text>
+            <Text style={styles.statLabel}>Sent %</Text>
+          </GlassCard>
+          
+          <GlassCard style={styles.statCard}>
+            <Text style={styles.statValue}>{progressAnalytics.length > 0 ? progressAnalytics[progressAnalytics.length - 1].averageGrade.toFixed(1) : '-'}</Text>
+            <Text style={styles.statLabel}>Latest Avg Grade</Text>
+          </GlassCard>
+        </View>
+
+        {/* Discipline Breakdown */}
+        <GlassCard style={styles.sectionCard}>
+          <Text style={styles.sectionTitle}>Discipline Breakdown</Text>
+          <View style={styles.disciplineList}>
+            {statsOverview?.sessionsByDiscipline && Object.keys(statsOverview.sessionsByDiscipline).length > 0 ? (
+              Object.entries(statsOverview.sessionsByDiscipline).map(([discipline, count], index) => (
+                <View key={index} style={styles.disciplineItem}>
+                  <View style={styles.disciplineInfo}>
+                    <Text style={styles.disciplineName}>{discipline}</Text>
+                    <Text style={styles.disciplineCount}>{count as number} sessions</Text>
+                  </View>
+                  <View style={styles.disciplineBar}>
+                    <View
+                      style={[
+                        styles.disciplineBarFill,
+                        {
+                          width: `${((count as number) / Math.max(...Object.values(statsOverview.sessionsByDiscipline).map(v => v as number))) * 100}%`,
+                        },
+                      ]}
+                    />
+                  </View>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.emptyText}>No discipline data available</Text>
+            )}
+          </View>
+        </GlassCard>
+
+        {/* Highest Grades */}
+        <GlassCard style={styles.sectionCard}>
+          <Text style={styles.sectionTitle}>Highest Grades by Discipline</Text>
+          <View style={styles.personalBests}>
+            {highestGrades && highestGrades.length > 0 ? (
+              highestGrades.map((grade: any, index: number) => (
+                <View key={index} style={styles.bestItem}>
+                  <Text style={styles.bestLabel}>{grade.discipline}</Text>
+                  <Text style={[styles.bestValue, { color: getGradeColor(grade.grade) }]}>
+                    {grade.grade}
+                  </Text>
+                  <Text style={styles.bestDate}>{grade.count} routes</Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.emptyText}>No grade data available</Text>
+            )}
+          </View>
+        </GlassCard>
+
+        {/* Weekly Activity */}
+        <GlassCard style={styles.sectionCard}>
+          <Text style={styles.sectionTitle}>Recent Activity</Text>
+          <View style={styles.weeklyActivity}>
+            {progressAnalytics && progressAnalytics.length > 0 ? (
+              progressAnalytics.slice(-8).map((week, index) => (
+                <View key={index} style={styles.weekItem}>
+                  <Text style={styles.weekLabel}>{new Date(week.date).toLocaleDateString()}</Text>
+                  <Text style={styles.weekCount}>{week.sessions} sessions</Text>
+                  <Text style={styles.weekRoutes}>{week.completed} completed</Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.emptyText}>No activity data available</Text>
+            )}
+          </View>
+        </GlassCard>
+
+        {/* Average Grades by Discipline */}
+        <GlassCard style={styles.sectionCard}>
+          <Text style={styles.sectionTitle}>Average Grades by Discipline</Text>
+          <View style={styles.sessionStats}>
+            {statsOverview?.averageDifficultyByDiscipline && Object.keys(statsOverview.averageDifficultyByDiscipline).length > 0 ? (
+              Object.entries(statsOverview.averageDifficultyByDiscipline).map(([discipline, avgGrade], index) => (
+                <View key={index} style={styles.sessionStat}>
+                  <Text style={styles.sessionStatValue}>{avgGrade.toFixed(1)}</Text>
+                  <Text style={styles.sessionStatLabel}>{discipline}</Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.emptyText}>No average grade data available</Text>
+            )}
+          </View>
+        </GlassCard>
       </ScrollView>
     </GradientBackground>
   );
@@ -215,29 +250,44 @@ const AnalyticsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  content: {
-    padding: 20,
+    padding: 16,
   },
   header: {
-    alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   title: {
     fontSize: 32,
-    fontWeight: '900',
-    color: '#ffffff',
+    fontWeight: 'bold',
+    color: '#FFFFFF',
     marginBottom: 8,
-    textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
-    fontWeight: '500',
+    color: '#CCCCCC',
+  },
+  periodCard: {
+    marginBottom: 20,
+  },
+  periodSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  periodButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  periodButtonActive: {
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  periodButtonText: {
+    color: '#CCCCCC',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  periodButtonTextActive: {
+    color: '#FFFFFF',
   },
   statsGrid: {
     flexDirection: 'row',
@@ -246,137 +296,159 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   statCard: {
-    width: (width - 60) / 2,
-    marginBottom: 16,
-  },
-  statGradient: {
-    padding: 20,
-    borderRadius: 16,
+    width: (width - 48) / 2,
+    padding: 16,
+    marginBottom: 12,
     alignItems: 'center',
-  },
-  statTitle: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontWeight: '600',
-    marginBottom: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   statValue: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: '#ffffff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
     marginBottom: 4,
   },
-  statSubtitle: {
-    fontSize: 10,
-    color: 'rgba(255, 255, 255, 0.7)',
-  },
-  analyticsCard: {
-    marginBottom: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-  },
-  cardTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#ffffff',
-    marginBottom: 20,
+  statLabel: {
+    fontSize: 12,
+    color: '#CCCCCC',
     textAlign: 'center',
   },
-  analyticsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+  sectionCard: {
     marginBottom: 20,
+    padding: 16,
   },
-  analyticsItem: {
-    alignItems: 'center',
-  },
-  analyticsLabel: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  analyticsValue: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: '#ffffff',
-  },
-  progressContainer: {
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
     marginBottom: 16,
   },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
+  disciplineList: {
+    gap: 12,
   },
-  progressLabel: {
+  disciplineItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  disciplineInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  disciplineName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginRight: 12,
+    minWidth: 80,
+  },
+  disciplineCount: {
     fontSize: 14,
-    color: '#ffffff',
+    color: '#CCCCCC',
+  },
+  disciplineBar: {
+    height: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 4,
+    flex: 1,
+    marginLeft: 12,
+  },
+  disciplineBarFill: {
+    height: '100%',
+    backgroundColor: '#4CAF50',
+    borderRadius: 4,
+  },
+  personalBests: {
+    gap: 12,
+  },
+  bestItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+  },
+  bestLabel: {
+    fontSize: 14,
+    color: '#CCCCCC',
+    flex: 1,
+  },
+  bestValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginHorizontal: 12,
+  },
+  bestDate: {
+    fontSize: 12,
+    color: '#999999',
+  },
+  weeklyActivity: {
+    gap: 8,
+  },
+  weekItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+  },
+  weekLabel: {
+    fontSize: 14,
+    color: '#FFFFFF',
     fontWeight: '600',
   },
-  progressValue: {
+  weekCount: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontWeight: '500',
+    color: '#CCCCCC',
   },
-  progressBar: {
-    height: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 4,
-    overflow: 'hidden',
+  weekRoutes: {
+    fontSize: 14,
+    color: '#999999',
   },
-  progressFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  quickStatsCard: {
-    marginBottom: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-  },
-  quickStatsGrid: {
+  sessionStats: {
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
-  quickStat: {
+  sessionStat: {
     alignItems: 'center',
-    flex: 1,
-    paddingVertical: 8,
   },
-  quickStatLabel: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontWeight: '600',
+  sessionStatValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
     marginBottom: 4,
+  },
+  sessionStatLabel: {
+    fontSize: 12,
+    color: '#CCCCCC',
     textAlign: 'center',
   },
-  quickStatValue: {
-    fontSize: 14,
-    color: '#ffffff',
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  motivationCard: {
-    marginBottom: 20,
-  },
-  motivationGradient: {
-    padding: 24,
-    borderRadius: 16,
+  errorCard: {
+    padding: 20,
     alignItems: 'center',
   },
-  motivationTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#ffffff',
-    marginBottom: 12,
+  errorText: {
+    color: '#FF6B6B',
+    fontSize: 16,
     textAlign: 'center',
+    marginBottom: 16,
   },
-  motivationText: {
+  retryButton: {
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#FFFFFF',
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
-    textAlign: 'center',
-    lineHeight: 20,
+    fontWeight: '600',
   },
-});
-
-export default AnalyticsScreen; 
+  emptyCard: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: '#CCCCCC',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+}); 

@@ -159,7 +159,7 @@ const CreateSessionScreen: React.FC<CreateSessionScreenProps> = ({ navigation })
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Discipline</Text>
                 <View style={styles.disciplineContainer}>
-                  {renderDisciplineButton(ClimbingDiscipline.BOULDER, 'Bouldering')}
+                  {renderDisciplineButton(ClimbingDiscipline.BOULDER, 'Boulder')}
                   {renderDisciplineButton(ClimbingDiscipline.LEAD, 'Lead')}
                   {renderDisciplineButton(ClimbingDiscipline.TOP_ROPE, 'Top Rope')}
                 </View>
@@ -303,19 +303,24 @@ const styles = StyleSheet.create({
   disciplineButton: {
     flex: 1,
     marginHorizontal: 4,
+    minWidth: 100,
   },
   disciplineButtonActive: {
     // Active state handled by gradient
   },
   disciplineGradient: {
-    padding: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   disciplineButtonText: {
     fontSize: 14,
     fontWeight: '600',
     color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
+    flexShrink: 1,
   },
   disciplineButtonTextActive: {
     color: '#ffffff',
