@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "AscendApp",
-    "slug": "AscendApp",
+    "name": "Ascend",
+    "slug": "ascend-climbing-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,16 +14,21 @@
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.ascendclimbing.app",
+      "buildNumber": "1",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
-        }
+        },
+        "CFBundleDisplayName": "Ascend"
       },
       "fonts": [
         "node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"
       ]
     },
     "android": {
+      "package": "com.ascendclimbing.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
