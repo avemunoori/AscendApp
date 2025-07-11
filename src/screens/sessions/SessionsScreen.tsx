@@ -42,7 +42,7 @@ const SessionsScreen: React.FC<SessionsScreenProps> = ({ navigation }) => {
 
   const loadSessions = async () => {
     try {
-      await dispatch(fetchSessions()).unwrap();
+      await dispatch(fetchSessions(undefined)).unwrap();
     } catch (error: any) {
       Alert.alert('Error', 'Failed to load sessions');
     }

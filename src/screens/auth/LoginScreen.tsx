@@ -19,6 +19,7 @@ import GradientBackground from '../../components/GradientBackground';
 import GlassCard from '../../components/GlassCard';
 import AnimatedButton from '../../components/AnimatedButton';
 import Logo from '../../components/Logo';
+import ValidatedEmailInput from '../../components/ValidatedEmailInput';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
@@ -125,21 +126,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             <GlassCard style={styles.formCard}>
               <Text style={styles.formTitle}>Welcome Back</Text>
               
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Email</Text>
-                <View style={styles.inputWrapper}>
-                  <TextInput
-                    style={styles.input}
-                    value={email}
-                    onChangeText={setEmail}
-                    placeholder="Enter your email"
-                    placeholderTextColor="rgba(255, 255, 255, 0.6)"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                </View>
-              </View>
+              <ValidatedEmailInput
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Enter your email"
+                label="Email"
+              />
 
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Password</Text>
@@ -163,6 +155,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 disabled={isLoading}
                 style={styles.loginButton}
               />
+
+              <View style={styles.forgotPasswordContainer}>
+                <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+                  <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+                </TouchableOpacity>
+              </View>
 
               <View style={styles.footer}>
                 <Text style={styles.footerText}>Don't have an account? </Text>
@@ -263,7 +261,17 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     marginTop: 8,
-    marginBottom: 24,
+    marginBottom: 16,
+  },
+  forgotPasswordContainer: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  forgotPasswordText: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 14,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
   footer: {
     flexDirection: 'row',

@@ -31,6 +31,62 @@ const periodOptions = [
   { label: 'This Year', value: 'year' },
 ];
 
+// Utility to map backend enum grade to user-friendly grade
+function formatBackendGrade(grade: string, discipline: string) {
+  if (!grade) return 'N/A';
+  // Boulder grades are like 'V5', lead/top rope are like 'YDS_5_10A'
+  if (discipline === 'BOULDER') return grade;
+  if (grade.startsWith('YDS_')) {
+    // Convert 'YDS_5_10A' to '5.10a'
+    const match = grade.match(/YDS_(5_\d{1,2}[A-D]?)/);
+    if (match) {
+      return match[1].replace('_', '.').toLowerCase();
+    }
+  }
+  return grade;
+}
+
+// Utility to prettify discipline names
+function prettyDisciplineName(discipline: string) {
+  switch (discipline) {
+    case 'TOP_ROPE': return 'Top Rope';
+    case 'BOULDER': return 'Boulder';
+    case 'LEAD': return 'Lead';
+    default: return discipline.charAt(0).toUpperCase() + discipline.slice(1).toLowerCase();
+  }
+}
+
+// Utility to get the nearest valid grade string for a discipline
+function getNearestValidGrade(avg: number, discipline: string) {
+  if (typeof avg !== 'number' || isNaN(avg)) return 'N/A';
+  if (discipline === 'BOULDER') {
+    const rounded = Math.round(avg);
+    if (rounded >= 0 && rounded <= 17) return `V${rounded}`;
+    return 'N/A';
+  }
+  if (discipline === 'LEAD' || discipline === 'TOP_ROPE') {
+    // YDS grades: 5.6, 5.7, ..., 5.15d
+    const ydsGrades = [
+      '5.6','5.7','5.8','5.9',
+      '5.10a','5.10b','5.10c','5.10d',
+      '5.11a','5.11b','5.11c','5.11d',
+      '5.12a','5.12b','5.12c','5.12d',
+      '5.13a','5.13b','5.13c','5.13d',
+      '5.14a','5.14b','5.14c','5.14d',
+      '5.15a','5.15b','5.15c','5.15d',
+    ];
+    // Map avg to index
+    const min = 6; // 5.6
+    const max = 15.75; // 5.15d
+    const step = 0.25;
+    let idx = Math.round((avg - min) / step);
+    if (idx < 0) idx = 0;
+    if (idx >= ydsGrades.length) idx = ydsGrades.length - 1;
+    return ydsGrades[idx];
+  }
+  return 'N/A';
+}
+
 export const AnalyticsScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const {
@@ -75,7 +131,7 @@ export const AnalyticsScreen: React.FC = () => {
         dispatch(fetchAllAnalytics({ period: selectedPeriod }))
           .finally(() => setLoading(false));
       } else {
-        dispatch(fetchAllAnalytics())
+        dispatch(fetchAllAnalytics(undefined))
           .finally(() => setLoading(false));
       }
     }
@@ -160,6 +216,11 @@ export const AnalyticsScreen: React.FC = () => {
     );
   }
 
+  // Determine most common discipline for average difficulty
+  const mostCommonDiscipline = stats && stats.sessionsByDiscipline
+    ? (Object.entries(stats.sessionsByDiscipline).sort((a, b) => (b[1] as number) - (a[1] as number))[0]?.[0] as keyof typeof ClimbingDiscipline)
+    : 'LEAD';
+
   return (
     <GradientBackground>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -171,48 +232,53 @@ export const AnalyticsScreen: React.FC = () => {
 
         {/* Period Selector */}
         <GlassCard style={styles.periodCard}>
-          <View style={[styles.periodSelector, { justifyContent: 'space-between' }]}> 
-            {periodOptions.map((option) => (
-              <TouchableOpacity
-                key={option.label}
-                activeOpacity={0.85}
-                style={{
-                  marginRight: 10,
-                  borderRadius: 18,
-                  backgroundColor: selectedPeriod === option.value || (!selectedPeriod && !option.value) ? '#6366f1' : 'rgba(255,255,255,0.08)',
-                  paddingVertical: 8,
-                  paddingHorizontal: 14,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                onPress={() => handlePeriodChange(option.value as PeriodType)}
-              >
-                <Text style={{
-                  color: selectedPeriod === option.value || (!selectedPeriod && !option.value) ? '#fff' : '#CCCCCC',
-                  fontWeight: selectedPeriod === option.value || (!selectedPeriod && !option.value) ? 'bold' : '600',
-                  fontSize: 13,
-                  letterSpacing: 0.5,
-                }}>{option.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.periodSelectorBarPolished}
+          >
+            {periodOptions.map((option, idx) => {
+              const isActive = selectedPeriod === option.value || (!selectedPeriod && !option.value);
+              return (
+                <TouchableOpacity
+                  key={option.label}
+                  activeOpacity={0.85}
+                  style={[
+                    styles.periodButtonPolished,
+                    isActive && styles.periodButtonPolishedActive,
+                    idx !== periodOptions.length - 1 && { marginRight: 16 },
+                  ]}
+                  onPress={() => handlePeriodChange(option.value as PeriodType)}
+                >
+                  <Text style={[
+                    styles.periodButtonPolishedText,
+                    isActive && styles.periodButtonPolishedTextActive,
+                  ]}>
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
         </GlassCard>
 
         {/* Key Stats */}
-        <View style={styles.statsGrid}>
-          <GlassCard style={styles.statCard}>
-            <Text style={styles.statValue}>{formatNumber(stats?.totalSessions ?? 0)}</Text>
-            <Text style={styles.statLabel}>Total Sessions</Text>
+        <View style={styles.statsGridCompact}>
+          <GlassCard style={styles.statCardCompact}>
+            <Text style={styles.statValueCompact} numberOfLines={1} ellipsizeMode="tail" adjustsFontSizeToFit>{formatNumber(stats?.totalSessions ?? 0)}</Text>
+            <Text style={styles.statLabelCompact}>Total Sessions</Text>
           </GlassCard>
-
-          <GlassCard style={styles.statCard}>
-            <Text style={styles.statValue}>{stats ? gradeUtils.getGradeString(stats.averageDifficulty, ClimbingDiscipline.BOULDER) : '-'}</Text>
-            <Text style={styles.statLabel}>Avg Difficulty</Text>
+          <GlassCard style={styles.statCardCompact}>
+            <Text style={styles.statValueCompact} numberOfLines={1} ellipsizeMode="tail" adjustsFontSizeToFit>{
+              stats && typeof stats.averageDifficulty === 'number'
+                ? getNearestValidGrade(stats.averageDifficulty, mostCommonDiscipline)
+                : '-'
+            }</Text>
+            <Text style={styles.statLabelCompact}>Avg Grade</Text>
           </GlassCard>
-
-          <GlassCard style={styles.statCard}>
-            <Text style={styles.statValue}>{(stats?.sentPercentage ?? 0).toFixed(1)}%</Text>
-            <Text style={styles.statLabel}>Sent %</Text>
+          <GlassCard style={styles.statCardCompact}>
+            <Text style={styles.statValueCompact} numberOfLines={1} ellipsizeMode="tail" adjustsFontSizeToFit>{(stats?.sentPercentage ?? 0).toFixed(1)}%</Text>
+            <Text style={styles.statLabelCompact}>Sent %</Text>
           </GlassCard>
         </View>
 
@@ -243,7 +309,7 @@ export const AnalyticsScreen: React.FC = () => {
                 return (
                   <View key={index} style={[styles.disciplineItem, { flexDirection: 'column', alignItems: 'flex-start', marginBottom: 12 }]}> 
                     <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-                      <Text style={[styles.disciplineName, { flexShrink: 1 }]}>{discipline}</Text>
+                      <Text style={[styles.disciplineName, { flexShrink: 1 }]}>{prettyDisciplineName(discipline)}</Text>
                       <Text style={styles.disciplineCount}>{count} {count === 1 ? 'session' : 'sessions'}</Text>
                     </View>
                     <View style={[styles.disciplineBar, { width: '100%', marginTop: 6 }]}> 
@@ -266,18 +332,24 @@ export const AnalyticsScreen: React.FC = () => {
           </View>
         </GlassCard>
 
-        {/* Highest Grades (still backend) */}
+        {/* Highest Grades (backend) */}
         <GlassCard style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Highest Grades by Discipline</Text>
           <View style={styles.personalBests}>
-            {highestGrades && highestGrades.length > 0 ? (
-              highestGrades.map((grade: any, index: number) => (
-                <View key={index} style={styles.bestItem}>
-                  <Text style={styles.bestLabel}>{grade.discipline}</Text>
-                  <Text style={[styles.bestValue, { color: getGradeColor(grade.grade) }]}>{grade.grade}</Text>
-                  <Text style={styles.bestDate}>{grade.count} routes</Text>
-                </View>
-              ))
+            {highestGrades && ((Array.isArray(highestGrades) && highestGrades.length > 0) || (typeof highestGrades === 'object' && Object.keys(highestGrades).length > 0)) ? (
+              Array.isArray(highestGrades)
+                ? highestGrades.map((grade: any, index: number) => (
+                    <View key={index} style={styles.bestItem}>
+                      <Text style={styles.bestLabel}>{prettyDisciplineName(grade.discipline)}</Text>
+                      <Text style={[styles.bestValue, { color: getGradeColor(formatBackendGrade(grade.grade, grade.discipline)) }]}>{formatBackendGrade(grade.grade, grade.discipline)}</Text>
+                    </View>
+                  ))
+                : Object.entries(highestGrades).map(([discipline, grade], index) => (
+                    <View key={index} style={styles.bestItem}>
+                      <Text style={styles.bestLabel}>{prettyDisciplineName(discipline)}</Text>
+                      <Text style={[styles.bestValue, { color: getGradeColor(formatBackendGrade(grade as string, discipline)) }]}>{formatBackendGrade(grade as string, discipline)}</Text>
+                    </View>
+                  ))
             ) : (
               <Text style={styles.emptyText}>No grade data available</Text>
             )}
@@ -287,12 +359,14 @@ export const AnalyticsScreen: React.FC = () => {
         {/* Average Grades by Discipline (backend) */}
         <GlassCard style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Average Grades by Discipline</Text>
-          <View style={styles.sessionStats}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', width: '100%' }}>
             {stats && stats.averageDifficultyByDiscipline && Object.keys(stats.averageDifficultyByDiscipline).length > 0 ? (
               Object.entries(stats.averageDifficultyByDiscipline).map(([discipline, avgGrade], index) => (
-                <View key={index} style={styles.sessionStat}>
-                  <Text style={styles.sessionStatValue}>{gradeUtils.getGradeString(avgGrade as number, discipline as any)}</Text>
-                  <Text style={styles.sessionStatLabel}>{discipline}</Text>
+                <View key={index} style={{ alignItems: 'center', flex: 1 }}>
+                  <Text style={[styles.sessionStatValue, { marginBottom: 2 }]}> 
+                    {getNearestValidGrade(avgGrade as number, discipline)}
+                  </Text>
+                  <Text style={styles.sessionStatLabel}>{prettyDisciplineName(discipline)}</Text>
                 </View>
               ))
             ) : (
@@ -529,5 +603,156 @@ const styles = StyleSheet.create({
     color: "#CCCCCC",
     fontSize: 16,
     textAlign: "center",
+  },
+  periodSelectorBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 4,
+    paddingHorizontal: 2,
+  },
+  periodButtonModern: {
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.10)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 70,
+    minHeight: 36,
+  },
+  periodButtonModernActive: {
+    backgroundColor: '#6366f1',
+    shadowColor: '#6366f1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  periodButtonModernText: {
+    color: '#CCCCCC',
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  periodButtonModernTextActive: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  periodSelectorBarPolished: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start', // was 'space-between'
+    alignItems: 'center',
+    marginVertical: 8,
+    paddingHorizontal: 4,
+  },
+  periodButtonPolished: {
+    paddingVertical: 8, // reduced from 12
+    paddingHorizontal: 14, // reduced from 22
+    borderRadius: 18, // reduced from 22
+    backgroundColor: 'rgba(255,255,255,0.10)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 60, // reduced from 80
+    minHeight: 32, // reduced from 40
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  periodButtonPolishedActive: {
+    backgroundColor: '#6366f1',
+    borderColor: '#fff',
+    borderWidth: 1.5,
+    shadowColor: '#6366f1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    elevation: 6,
+    transform: [{ scale: 1.07 }],
+  },
+  periodButtonPolishedText: {
+    color: '#CCCCCC',
+    fontSize: 13, // reduced from 16
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  periodButtonPolishedTextActive: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  statsGridPolished: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 28,
+    marginTop: 8,
+  },
+  statCardPolished: {
+    width: '30%',
+    minWidth: 100,
+    maxWidth: 160,
+    paddingVertical: 24,
+    paddingHorizontal: 10,
+    marginBottom: 18,
+    alignItems: 'center',
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.10)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.10,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  statValuePolished: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  statLabelPolished: {
+    fontSize: 14,
+    color: '#CCCCCC',
+    textAlign: 'center',
+    fontWeight: '500',
+    letterSpacing: 0.2,
+  },
+  statsGridCompact: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 18,
+    marginTop: 8,
+  },
+  statCardCompact: {
+    flex: 1,
+    minWidth: 90,
+    maxWidth: 170, // increased from 140
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    marginHorizontal: 8,
+    alignItems: 'center',
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.10)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  statValueCompact: {
+    fontSize: 16, // reduced from 20
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 2,
+    textAlign: 'center',
+  },
+  statLabelCompact: {
+    fontSize: 10,
+    color: '#CCCCCC',
+    textAlign: 'center',
+    fontWeight: '500',
+    letterSpacing: 0.1,
+    marginTop: 2,
+    lineHeight: 13,
   },
 });

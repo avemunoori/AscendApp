@@ -11,6 +11,20 @@ export interface RegisterRequest {
   lastName: string;
 }
 
+// Password Reset Types
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface VerifyResetCodeRequest {
+  code: string;
+}
+
+export interface ResetPasswordRequest {
+  code: string;
+  newPassword: string;
+}
+
 export interface AuthResponse {
   token: string;
   user: User;

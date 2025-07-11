@@ -2,6 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   LoginRequest,
   RegisterRequest,
+  ForgotPasswordRequest,
+  VerifyResetCodeRequest,
+  ResetPasswordRequest,
   AuthResponse,
   User,
   ClimbingSession,
@@ -225,6 +228,28 @@ class ApiService {
 
   async getCurrentUser(): Promise<User> {
     return this.request<User>('/users/me');
+  }
+
+  // Password Reset Endpoints
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  async verifyResetCode(code: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>('/auth/verify-reset-code', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    });
+  }
+
+  async resetPassword(code: string, newPassword: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ code, newPassword }),
+    });
   }
 
   // Session Endpoints
