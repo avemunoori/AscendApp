@@ -23,6 +23,10 @@ import { EXPO_PUBLIC_BACKEND_API_URL } from '@env';
 // API Configuration
 const API_BASE_URL = EXPO_PUBLIC_BACKEND_API_URL;
 
+console.log('🔧 API Configuration:');
+console.log('🔧 EXPO_PUBLIC_BACKEND_API_URL:', EXPO_PUBLIC_BACKEND_API_URL);
+console.log('🔧 API_BASE_URL:', API_BASE_URL);
+
 if (!API_BASE_URL) {
   throw new Error('EXPO_PUBLIC_BACKEND_API_URL environment variable is required');
 }
@@ -38,7 +42,17 @@ class ApiService {
 
   // Initialize token from storage
   async initialize() {
+    console.log('🔧 Initializing API service...');
     this.token = await AsyncStorage.getItem('auth_token');
+    console.log('🔧 Token from storage:', this.token ? 'Found' : 'Not found');
+  }
+
+  // Get current token
+  async getToken(): Promise<string | null> {
+    if (!this.token) {
+      this.token = await AsyncStorage.getItem('auth_token');
+    }
+    return this.token;
   }
 
   // Set token and save to storage
@@ -96,17 +110,21 @@ class ApiService {
       
       if (!response.ok) {
         if (response.status === 401) {
-          await this.clearToken();
+          // Only clear token if this isn't a validation request
+          if (!endpoint.includes('/auth/validate')) {
+            await this.clearToken();
+          }
           throw new Error('Unauthorized - Please login again');
         }
         
-        // Try to parse JSON error first, fallback to text
+        // Parse standardized error response format
         let errorMessage = `HTTP ${response.status}`;
         try {
           const errorData = await response.json();
+          // Backend now always returns { "message": "error text" }
           errorMessage = errorData.message || errorMessage;
         } catch {
-          // If JSON parsing fails, try to get text content
+          // Fallback for non-JSON responses
           try {
             const errorText = await response.text();
             errorMessage = errorText || errorMessage;
@@ -206,12 +224,12 @@ class ApiService {
   }
 
   async getCurrentUser(): Promise<User> {
-    return this.request<User>('/api/users/me');
+    return this.request<User>('/users/me');
   }
 
   // Session Endpoints
   async createSession(sessionData: CreateSessionRequest): Promise<ClimbingSession> {
-    return this.request<ClimbingSession>('/api/sessions', {
+    return this.request<ClimbingSession>('/sessions', {
       method: 'POST',
       body: JSON.stringify(sessionData),
     });
@@ -231,52 +249,57 @@ class ApiService {
     }
 
     const queryString = params.toString();
-    const endpoint = queryString ? `/api/sessions?${queryString}` : '/api/sessions';
+    const endpoint = queryString ? `/sessions?${queryString}` : '/sessions';
     
     return this.request<ClimbingSession[]>(endpoint);
   }
 
   async getSession(id: string): Promise<ClimbingSession> {
-    return this.request<ClimbingSession>(`/api/sessions/${id}`);
+    return this.request<ClimbingSession>(`/sessions/${id}`);
   }
 
   async updateSession(id: string, sessionData: UpdateSessionRequest): Promise<ClimbingSession> {
-    return this.request<ClimbingSession>(`/api/sessions/${id}`, {
+    return this.request<ClimbingSession>(`/sessions/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(sessionData),
     });
   }
 
   async deleteSession(id: string): Promise<void> {
-    return this.request<void>(`/api/sessions/${id}`, {
+    return this.request<void>(`/sessions/${id}`, {
       method: 'DELETE',
     });
   }
 
   // Grade Endpoints
   async getGrades(discipline: ClimbingDiscipline): Promise<Grade[]> {
-    return this.request<Grade[]>(`/api/sessions/grades/${discipline}`);
+    return this.request<Grade[]>(`/sessions/grades/${discipline}`);
   }
 
   // Analytics Endpoints
-  async getSessionAnalytics(): Promise<SessionAnalytics> {
-    return this.request<SessionAnalytics>('/api/sessions/analytics');
+  async getSessionAnalytics(period?: 'week' | 'month' | 'year'): Promise<SessionAnalytics> {
+    const endpoint = period ? `/sessions/analytics?period=${period}` : '/sessions/analytics';
+    return this.request<SessionAnalytics>(endpoint);
   }
 
-  async getStatsOverview(): Promise<StatsOverview> {
-    return this.request<StatsOverview>('/api/sessions/stats/overview');
+  async getStatsOverview(period?: 'week' | 'month' | 'year'): Promise<StatsOverview> {
+    const endpoint = period ? `/sessions/stats/overview?period=${period}` : '/sessions/stats/overview';
+    return this.request<StatsOverview>(endpoint);
   }
 
-  async getProgressAnalytics(): Promise<ProgressAnalytics[]> {
-    return this.request<ProgressAnalytics[]>('/api/sessions/stats/progress');
+  async getProgressAnalytics(period?: 'week' | 'month' | 'year'): Promise<ProgressAnalytics[]> {
+    const endpoint = period ? `/sessions/stats/progress?period=${period}` : '/sessions/stats/progress';
+    return this.request<ProgressAnalytics[]>(endpoint);
   }
 
-  async getHighestGrades(): Promise<HighestGradeStats[]> {
-    return this.request<HighestGradeStats[]>('/api/sessions/stats/highest');
+  async getHighestGrades(period?: 'week' | 'month' | 'year'): Promise<HighestGradeStats[]> {
+    const endpoint = period ? `/sessions/stats/highest?period=${period}` : '/sessions/stats/highest';
+    return this.request<HighestGradeStats[]>(endpoint);
   }
 
-  async getAverageGrades(): Promise<AverageGradeStats[]> {
-    return this.request<AverageGradeStats[]>('/api/sessions/stats/average');
+  async getAverageGrades(period?: 'week' | 'month' | 'year'): Promise<AverageGradeStats[]> {
+    const endpoint = period ? `/sessions/stats/average?period=${period}` : '/sessions/stats/average';
+    return this.request<AverageGradeStats[]>(endpoint);
   }
 }
 

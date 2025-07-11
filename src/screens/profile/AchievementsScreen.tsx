@@ -67,7 +67,15 @@ const AchievementsScreen = () => {
               opacity: rankAnim,
             }}>
               <LinearGradient
-                colors={['#764ba2', '#667eea', '#f093fb']}
+                colors={
+                  rank === 'Bronze'
+                    ? ['#cd7f32', '#b87333']
+                    : rank === 'Silver'
+                    ? ['#c0c0c0', '#a9a9a9']
+                    : rank === 'Gold'
+                    ? ['#ffd700', '#ffec8b']
+                    : ['#764ba2', '#667eea', '#f093fb']
+                }
                 style={styles.rankBadge}
               >
                 <Icon name={rankIcons[rank] || 'emoji-events'} size={28} color="#fff" style={{ marginBottom: 2 }} />

@@ -16,6 +16,7 @@ import { ClimbingConditions } from '../../types/weather';
 import GradientBackground from '../../components/GradientBackground';
 import GlassCard from '../../components/GlassCard';
 import AnimatedButton from '../../components/AnimatedButton';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
@@ -28,6 +29,7 @@ const WeatherScreen = () => {
   
   const [locationInput, setLocationInput] = useState(currentLocation);
   const [isSearching, setIsSearching] = useState(false);
+  const [tempUnit, setTempUnit] = useState<'C' | 'F'>('F');
 
   // Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -79,6 +81,10 @@ const WeatherScreen = () => {
     } finally {
       setIsSearching(false);
     }
+  };
+
+  const handleToggleTempUnit = () => {
+    setTempUnit((prev) => (prev === 'F' ? 'C' : 'F'));
   };
 
   const getConditionColor = (overall: string): [string, string] => {
@@ -160,12 +166,17 @@ const WeatherScreen = () => {
                 placeholderTextColor="#9ca3af"
                 onSubmitEditing={handleLocationSearch}
               />
-              <AnimatedButton
-                title="🔍"
+              <TouchableOpacity
                 onPress={handleLocationSearch}
-                style={styles.searchButton}
+                style={[
+                  styles.searchButton,
+                  { backgroundColor: '#6366f1', borderRadius: 12, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#4f46e5' }
+                ]}
                 disabled={isSearching}
-              />
+                accessibilityLabel="Search for location"
+              >
+                <Icon name="search" size={28} color="#fff" />
+              </TouchableOpacity>
             </View>
           </GlassCard>
 
@@ -201,11 +212,16 @@ const WeatherScreen = () => {
                         {weatherData.current.condition.text}
                       </Text>
                     </View>
+                    <TouchableOpacity onPress={handleToggleTempUnit} style={{ marginLeft: 10, padding: 6, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.12)' }}>
+                      <Text style={{ color: '#fff', fontWeight: 'bold' }}>{tempUnit === 'F' ? '°F' : '°C'}</Text>
+                    </TouchableOpacity>
                   </View>
                   
                   <View style={styles.overviewStats}>
                     <View style={styles.stat}>
-                      <Text style={styles.statValue}>{weatherData.current.temp_c}°C</Text>
+                      <Text style={styles.statValue}>
+                        {tempUnit === 'F' ? `${weatherData.current.temp_f}°F` : `${weatherData.current.temp_c}°C`}
+                      </Text>
                       <Text style={styles.statLabel}>Temperature</Text>
                     </View>
                     <View style={styles.stat}>

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Modal, Pressable } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/authSlice';
 import GradientBackground from '../../components/GradientBackground';
@@ -26,6 +26,14 @@ const ProfileScreen = () => {
         },
       ]
     );
+  };
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState<'settings' | 'help' | 'about' | null>(null);
+
+  const handleMenuPress = (content: 'settings' | 'help' | 'about') => {
+    setModalContent(content);
+    setModalVisible(true);
   };
 
   // Icon mapping for achievements and ranks
@@ -83,15 +91,15 @@ const ProfileScreen = () => {
         {/* Remove sessions, rank, achievements logic */}
 
         <GlassCard style={styles.menuSection}>
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuPress('settings')}>
             <Icon name="settings" size={22} color="#764ba2" style={styles.menuIcon} />
             <Text style={styles.menuText}>Settings</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuPress('help')}>
             <Icon name="help-outline" size={22} color="#764ba2" style={styles.menuIcon} />
             <Text style={styles.menuText}>Help & Support</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuPress('about')}>
             <Icon name="info-outline" size={22} color="#764ba2" style={styles.menuIcon} />
             <Text style={styles.menuText}>About</Text>
           </TouchableOpacity>
@@ -102,6 +110,35 @@ const ProfileScreen = () => {
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Info Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 18, padding: 28, width: '85%', alignItems: 'center' }}>
+            <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 12, color: '#764ba2' }}>
+              {modalContent === 'settings' && 'Settings'}
+              {modalContent === 'help' && 'Help & Support'}
+              {modalContent === 'about' && 'About'}
+            </Text>
+            <Text style={{ fontSize: 16, color: '#22223b', marginBottom: 18, textAlign: 'center' }}>
+              {modalContent === 'settings' && 'Settings are coming soon! You will be able to customize your experience here.'}
+              {modalContent === 'help' && 'For help and support, contact us at support@ascendapp.com or visit our FAQ section in the next update.'}
+              {modalContent === 'about' && 'Ascend is a modern climbing tracker app built with React Native. Track your sessions, analyze your progress, and check weather conditions for your next climb!'}
+            </Text>
+            <Pressable
+              style={{ backgroundColor: '#764ba2', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 28 }}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>Close</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </GradientBackground>
   );
 };

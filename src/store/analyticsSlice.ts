@@ -55,15 +55,15 @@ export const fetchAverageGrades = createAsyncThunk(
 
 export const fetchAllAnalytics = createAsyncThunk(
   'analytics/fetchAllAnalytics',
-  async () => {
+  async (params?: { period?: 'week' | 'month' | 'year' }) => {
+    const period = params?.period;
     const [analytics, stats, progress, highest, average] = await Promise.all([
-      apiService.getSessionAnalytics(),
-      apiService.getStatsOverview(),
-      apiService.getProgressAnalytics(),
-      apiService.getHighestGrades(),
-      apiService.getAverageGrades(),
+      apiService.getSessionAnalytics(period),
+      apiService.getStatsOverview(period),
+      apiService.getProgressAnalytics(period),
+      apiService.getHighestGrades(period),
+      apiService.getAverageGrades(period),
     ]);
-    
     return {
       analytics,
       stats,

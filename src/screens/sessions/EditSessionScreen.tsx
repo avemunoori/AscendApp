@@ -73,6 +73,16 @@ const EditSessionScreen = () => {
     ]).start();
   }, []);
 
+  // Reset grade when discipline changes to prevent invalid combinations
+  const handleDisciplineChange = (newDiscipline: ClimbingDiscipline) => {
+    setDiscipline(newDiscipline);
+    // Only clear grade if it's not compatible with the new discipline
+    const gradeOptions = getGradeOptions();
+    if (!gradeOptions.includes(grade)) {
+      setGrade('');
+    }
+  };
+
   const getGradeOptions = () => {
     switch (discipline) {
       case ClimbingDiscipline.BOULDER:
@@ -91,7 +101,7 @@ const EditSessionScreen = () => {
         styles.disciplineButton,
         discipline === disc && styles.disciplineButtonActive
       ]}
-      onPress={() => setDiscipline(disc)}
+      onPress={() => handleDisciplineChange(disc)}
     >
       <LinearGradient
         colors={discipline === disc ? ['#6366f1', '#4f46e5'] : ['rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.05)']}
@@ -151,7 +161,19 @@ const EditSessionScreen = () => {
         { text: 'OK', onPress: () => navigation.goBack() }
       ]);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to update session');
+      // Enhanced error handling for backend validation messages
+      let errorMessage = error.message || 'Failed to update session';
+      
+      // Make error messages more user-friendly
+      if (errorMessage.includes('Grade is not compatible with the selected discipline')) {
+        errorMessage = 'The selected grade is not valid for this climbing discipline. Please choose an appropriate grade.';
+      } else if (errorMessage.includes('Invalid discipline')) {
+        errorMessage = 'Please select a valid climbing discipline.';
+      } else if (errorMessage.includes('Invalid grade format')) {
+        errorMessage = 'Please select a valid grade from the options provided.';
+      }
+      
+      Alert.alert('Session Update Failed', errorMessage);
     } finally {
       setSaving(false);
     }
@@ -342,25 +364,24 @@ const styles = StyleSheet.create({
   },
   disciplineContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start', // Align buttons to the left
   },
   disciplineButton: {
-    flex: 1,
-    marginHorizontal: 4,
-    minWidth: 100,
+    minWidth: 70, // Make button smaller
+    marginRight: 6, // Slightly less spacing
   },
   disciplineButtonActive: {
     // Active state handled by gradient
   },
   disciplineGradient: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
+    paddingVertical: 8, // Less vertical padding
+    paddingHorizontal: 10, // Less horizontal padding
+    borderRadius: 8, // Smaller border radius
     alignItems: 'center',
     justifyContent: 'center',
   },
   disciplineButtonText: {
-    fontSize: 14,
+    fontSize: 12, // Smaller font size
     fontWeight: '600',
     color: 'rgba(255, 255, 255, 0.8)',
     textAlign: 'center',

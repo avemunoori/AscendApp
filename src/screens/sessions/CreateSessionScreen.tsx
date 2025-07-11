@@ -56,6 +56,12 @@ const CreateSessionScreen: React.FC<CreateSessionScreenProps> = ({ navigation })
     ]).start();
   }, []);
 
+  // Reset grade when discipline changes to prevent invalid combinations
+  const handleDisciplineChange = (newDiscipline: ClimbingDiscipline) => {
+    setDiscipline(newDiscipline);
+    setGrade(''); // Clear grade when discipline changes
+  };
+
   const handleCreateSession = async () => {
     if (!grade.trim()) {
       Alert.alert('Error', 'Please enter a grade');
@@ -75,7 +81,19 @@ const CreateSessionScreen: React.FC<CreateSessionScreenProps> = ({ navigation })
         { text: 'OK', onPress: () => navigation.goBack() }
       ]);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to create session');
+      // Enhanced error handling for backend validation messages
+      let errorMessage = error.message || 'Failed to create session';
+      
+      // Make error messages more user-friendly
+      if (errorMessage.includes('Grade is not compatible with the selected discipline')) {
+        errorMessage = 'The selected grade is not valid for this climbing discipline. Please choose an appropriate grade.';
+      } else if (errorMessage.includes('Invalid discipline')) {
+        errorMessage = 'Please select a valid climbing discipline.';
+      } else if (errorMessage.includes('Invalid grade format')) {
+        errorMessage = 'Please select a valid grade from the options provided.';
+      }
+      
+      Alert.alert('Session Creation Failed', errorMessage);
     }
   };
 
@@ -97,7 +115,7 @@ const CreateSessionScreen: React.FC<CreateSessionScreenProps> = ({ navigation })
         styles.disciplineButton,
         discipline === disc && styles.disciplineButtonActive
       ]}
-      onPress={() => setDiscipline(disc)}
+      onPress={() => handleDisciplineChange(disc)}
     >
       <LinearGradient
         colors={discipline === disc ? ['#6366f1', '#4f46e5'] : ['rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.05)']}
@@ -298,32 +316,41 @@ const styles = StyleSheet.create({
   },
   disciplineContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
   disciplineButton: {
-    flex: 1,
-    marginHorizontal: 4,
-    minWidth: 100,
+    marginRight: 10,
+    minWidth: 70,
   },
   disciplineButtonActive: {
     // Active state handled by gradient
   },
   disciplineGradient: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    borderRadius: 18,
+    shadowColor: '#4f46e5',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    elevation: 4,
     alignItems: 'center',
     justifyContent: 'center',
   },
   disciplineButtonText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
     color: 'rgba(255, 255, 255, 0.8)',
     textAlign: 'center',
     flexShrink: 1,
   },
   disciplineButtonTextActive: {
-    color: '#ffffff',
+    color: '#fff',
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(0,0,0,0.12)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   gradeContainer: {
     flexDirection: 'row',
