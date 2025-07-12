@@ -13,8 +13,9 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { apiService } from '../../services/api';
-import { ForgotPasswordScreenNavigationProp } from '../../types/navigation';
+import { ForgotPasswordScreenNavigationProp, ForgotPasswordScreenRouteProp } from '../../types/navigation';
 import GradientBackground from '../../components/GradientBackground';
+import { ErrorHandler } from '../../utils/errorHandler';
 import GlassCard from '../../components/GlassCard';
 import AnimatedButton from '../../components/AnimatedButton';
 import Logo from '../../components/Logo';
@@ -24,9 +25,10 @@ const { width, height } = Dimensions.get('window');
 
 type ForgotPasswordScreenProps = {
   navigation: ForgotPasswordScreenNavigationProp;
+  route: ForgotPasswordScreenRouteProp;
 };
 
-const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation }) => {
+const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation, route }) => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState<'email' | 'code' | 'password'>('email');
@@ -34,6 +36,25 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(false);
+
+  // Check for deep link reset code on component mount
+  useEffect(() => {
+    // Check if we have a reset code from deep link
+    if (global.resetPasswordCode) {
+      console.log('🔗 Found reset code from deep link:', global.resetPasswordCode);
+      setResetCode(global.resetPasswordCode);
+      setStep('code');
+      // Clear the global code after using it
+      global.resetPasswordCode = undefined;
+    }
+    
+    // Check if we have a reset code from route params
+    if (route.params?.resetCode) {
+      console.log('🔗 Found reset code from route params:', route.params.resetCode);
+      setResetCode(route.params.resetCode);
+      setStep('code');
+    }
+  }, [route.params?.resetCode]);
 
   // Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -76,13 +97,13 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
     try {
       await apiService.forgotPassword(email);
       setStep('code');
-      Alert.alert(
-        'Reset Code Sent',
+      ErrorHandler.showSuccessAlert(
         'If an account with this email exists, you will receive a 6-digit reset code. Please check your email.',
-        [{ text: 'OK' }]
+        'Reset Code Sent'
       );
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to send reset code');
+      const appError = ErrorHandler.handlePasswordResetError(error);
+      ErrorHandler.showErrorAlert(appError, 'Error');
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +120,8 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
       await apiService.verifyResetCode(resetCode);
       setStep('password');
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Invalid or expired reset code');
+      const appError = ErrorHandler.handlePasswordResetError(error);
+      ErrorHandler.showErrorAlert(appError, 'Error');
     } finally {
       setIsLoading(false);
     }
@@ -124,18 +146,14 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
     setIsLoading(true);
     try {
       await apiService.resetPassword(resetCode, newPassword);
-      Alert.alert(
-        'Password Reset Successful',
+      ErrorHandler.showSuccessAlert(
         'Your password has been reset successfully. You can now log in with your new password.',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('Login'),
-          },
-        ]
+        'Password Reset Successful'
       );
+      navigation.navigate('Login');
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to reset password');
+      const appError = ErrorHandler.handlePasswordResetError(error);
+      ErrorHandler.showErrorAlert(appError, 'Error');
     } finally {
       setIsLoading(false);
     }

@@ -7,10 +7,13 @@ import GlassCard from '../../components/GlassCard';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Animated } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { PrivacyPolicyScreenNavigationProp, TermsOfServiceScreenNavigationProp } from '../../types/navigation';
 
 const ProfileScreen = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
+  const navigation = useNavigation<PrivacyPolicyScreenNavigationProp | TermsOfServiceScreenNavigationProp>();
   // Remove sessions, rank, achievements logic
 
   const handleLogout = () => {
@@ -102,6 +105,23 @@ const ProfileScreen = () => {
           <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuPress('about')}>
             <Icon name="info-outline" size={22} color="#764ba2" style={styles.menuIcon} />
             <Text style={styles.menuText}>About</Text>
+          </TouchableOpacity>
+        </GlassCard>
+
+        <GlassCard style={styles.legalSection}>
+          <TouchableOpacity 
+            style={styles.menuItem} 
+            onPress={() => navigation.navigate('PrivacyPolicy' as any)}
+          >
+            <Icon name="privacy-tip" size={22} color="#764ba2" style={styles.menuIcon} />
+            <Text style={styles.menuText}>Privacy Policy</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.menuItem} 
+            onPress={() => navigation.navigate('TermsOfService' as any)}
+          >
+            <Icon name="description" size={22} color="#764ba2" style={styles.menuIcon} />
+            <Text style={styles.menuText}>Terms of Service</Text>
           </TouchableOpacity>
         </GlassCard>
 
@@ -206,6 +226,20 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   menuSection: {
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderRadius: 24,
+    marginBottom: 28,
+    shadowColor: '#764ba2',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 18,
+    elevation: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+  },
+  legalSection: {
     backgroundColor: 'rgba(255,255,255,0.18)',
     borderRadius: 24,
     marginBottom: 28,

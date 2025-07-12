@@ -22,6 +22,8 @@ import { AnalyticsScreen } from '../screens/analytics/AnalyticsScreen';
 import WeatherScreen from '../screens/weather/WeatherScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import AchievementsScreen from '../screens/profile/AchievementsScreen';
+import PrivacyPolicy from '../components/PrivacyPolicy';
+import TermsOfService from '../components/TermsOfService';
 
 // Import components
 import LoadingScreen from '../components/LoadingScreen';
@@ -218,6 +220,30 @@ const AppNavigator = () => {
                 headerTintColor: '#ffffff',
               }}
             />
+            <Stack.Screen
+              name="PrivacyPolicy"
+              component={PrivacyPolicy}
+              options={{
+                headerShown: true,
+                title: 'Privacy Policy',
+                headerStyle: {
+                  backgroundColor: '#6366f1',
+                },
+                headerTintColor: '#ffffff',
+              }}
+            />
+            <Stack.Screen
+              name="TermsOfService"
+              component={TermsOfService}
+              options={{
+                headerShown: true,
+                title: 'Terms of Service',
+                headerStyle: {
+                  backgroundColor: '#6366f1',
+                },
+                headerTintColor: '#ffffff',
+              }}
+            />
           </>
         ) : (
           // Authentication stack
@@ -225,6 +251,30 @@ const AppNavigator = () => {
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+            <Stack.Screen
+              name="PrivacyPolicy"
+              component={PrivacyPolicy}
+              options={{
+                headerShown: true,
+                title: 'Privacy Policy',
+                headerStyle: {
+                  backgroundColor: '#6366f1',
+                },
+                headerTintColor: '#ffffff',
+              }}
+            />
+            <Stack.Screen
+              name="TermsOfService"
+              component={TermsOfService}
+              options={{
+                headerShown: true,
+                title: 'Terms of Service',
+                headerStyle: {
+                  backgroundColor: '#6366f1',
+                },
+                headerTintColor: '#ffffff',
+              }}
+            />
           </>
         )}
       </Stack.Navigator>

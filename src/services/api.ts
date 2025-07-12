@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SecureStorage } from '../utils/secureStorage';
 import {
   LoginRequest,
   RegisterRequest,
@@ -46,14 +47,14 @@ class ApiService {
   // Initialize token from storage
   async initialize() {
     console.log('🔧 Initializing API service...');
-    this.token = await AsyncStorage.getItem('auth_token');
-    console.log('🔧 Token from storage:', this.token ? 'Found' : 'Not found');
+    this.token = await SecureStorage.getToken();
+    console.log('🔧 Token from secure storage:', this.token ? 'Found' : 'Not found');
   }
 
   // Get current token
   async getToken(): Promise<string | null> {
     if (!this.token) {
-      this.token = await AsyncStorage.getItem('auth_token');
+      this.token = await SecureStorage.getToken();
     }
     return this.token;
   }
@@ -61,13 +62,13 @@ class ApiService {
   // Set token and save to storage
   async setToken(token: string) {
     this.token = token;
-    await AsyncStorage.setItem('auth_token', token);
+    await SecureStorage.storeToken(token);
   }
 
   // Clear token and remove from storage
   async clearToken() {
     this.token = null;
-    await AsyncStorage.removeItem('auth_token');
+    await SecureStorage.clearAuthData();
     
     // Dispatch logout action if dispatch is available
     if (this.dispatch) {
@@ -78,7 +79,7 @@ class ApiService {
   // Clear token without dispatching (used by logout thunk)
   async clearTokenOnly() {
     this.token = null;
-    await AsyncStorage.removeItem('auth_token');
+    await SecureStorage.clearAuthData();
   }
 
   // Get auth headers
