@@ -22,10 +22,7 @@
           "NSAllowsArbitraryLoads": true
         },
         "CFBundleDisplayName": "Ascend"
-      },
-      "fonts": [
-        "node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"
-      ]
+      }
     },
     "android": {
       "package": "com.ascendclimbing.app",
@@ -37,9 +34,6 @@
       "edgeToEdgeEnabled": true,
       "permissions": [
         "INTERNET"
-      ],
-      "fonts": [
-        "node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"
       ]
     },
     "web": {
