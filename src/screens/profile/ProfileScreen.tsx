@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Modal, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Modal, Pressable, ScrollView } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/authSlice';
 import GradientBackground from '../../components/GradientBackground';
@@ -72,7 +72,11 @@ const ProfileScreen = () => {
 
   return (
     <GradientBackground>
-      <View style={styles.container}>
+      <ScrollView 
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
         <GlassCard style={styles.profileSection}>
           <View style={styles.avatarWrapper}>
             <View style={styles.avatarShadow}>
@@ -129,7 +133,7 @@ const ProfileScreen = () => {
           <Icon name="logout" size={20} color="#fff" style={{ marginRight: 8 }} />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
 
       {/* Info Modal */}
       <Modal
@@ -166,8 +170,10 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  contentContainer: {
     padding: 24,
-    justifyContent: 'center',
+    paddingBottom: 40,
   },
   profileSection: {
     alignItems: 'center',
