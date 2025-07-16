@@ -2,7 +2,7 @@
   "expo": {
     "name": "Ascend",
     "slug": "ascend-climbing-app",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,15 +14,20 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.ascendclimbing.app",
-      "buildNumber": "1",
+      "buildNumber": "9",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
         },
-        "CFBundleDisplayName": "Ascend"
-      }
+        "CFBundleDisplayName": "Ascend",
+        "CFBundleIconName": "AppIcon",
+        "NSCameraUsageDescription": "This app does not use camera access.",
+        "NSPhotoLibraryUsageDescription": "This app does not use photo library access.",
+        "NSLocationWhenInUseUsageDescription": "This app does not use location services."
+      },
+      "appStoreUrl": "https://apps.apple.com/app/ascend-climbing-app/id1234567890"
     },
     "android": {
       "package": "com.ascendclimbing.app",
@@ -34,10 +39,19 @@
       "edgeToEdgeEnabled": true,
       "permissions": [
         "INTERNET"
-      ]
+      ],
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.ascendclimbing.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "650c0d0b-6ea6-43ce-a72a-d7e4afdc5795"
+      }
+    },
+    "owner": "avemunoori",
+    "description": "Track your climbing progress, manage training plans, and analyze performance across bouldering, lead, and top rope climbing. Beautiful glass morphism design with comprehensive analytics.",
+    "primaryColor": "#764ba2"
   }
 }
