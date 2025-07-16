@@ -17,6 +17,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.ascendclimbing.app",
       "buildNumber": "9",
+      "icon": "./assets/icon.png",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
