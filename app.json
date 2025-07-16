@@ -8,6 +8,9 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "scheme": "ascend",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -24,12 +27,6 @@
         },
         "CFBundleDisplayName": "Ascend",
         "CFBundleIconName": "AppIcon",
-        "CFBundleIcons": {
-          "CFBundlePrimaryIcon": {
-            "CFBundleIconFiles": ["icon-120"],
-            "CFBundleIconName": "AppIcon"
-          }
-        },
         "NSCameraUsageDescription": "This app does not use camera access.",
         "NSPhotoLibraryUsageDescription": "This app does not use photo library access.",
         "NSLocationWhenInUseUsageDescription": "This app does not use location services."
