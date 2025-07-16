@@ -68,6 +68,13 @@
       "idiom": "iphone",
       "platform": "ios",
       "scale": "1x",
+      "size": "120x120"
+    },
+    {
+      "filename": "AscendLogo.png",
+      "idiom": "iphone",
+      "platform": "ios",
+      "scale": "1x",
       "size": "1024x1024"
     }
   ],
