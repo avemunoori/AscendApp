@@ -4,7 +4,6 @@
     "slug": "ascend-climbing-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "scheme": "ascend",
@@ -21,7 +20,8 @@
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
         },
-        "CFBundleDisplayName": "Ascend"
+        "CFBundleDisplayName": "Ascend",
+        "CFBundleIconName": "AppIcon"
       }
     },
     "android": {
