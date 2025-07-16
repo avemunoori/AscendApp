@@ -26,6 +26,6 @@ export type ForgotPasswordScreenRouteProp = RouteProp<RootStackParamList, 'Forgo
 export type SessionDetailScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'SessionDetail'>;
 export type SessionDetailScreenRouteProp = RouteProp<RootStackParamList, 'SessionDetail'>;
 export type EditSessionScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EditSession'>;
-export type EditSessionScreenRouteProp = RouteProp<RootStackParamList, 'EditSession'>;
+export type EditSessionScreenRouteProp = RouteProp<RootStackParamList, 'EditSession'>; 
 export type PrivacyPolicyScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'PrivacyPolicy'>;
 export type TermsOfServiceScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'TermsOfService'>; 

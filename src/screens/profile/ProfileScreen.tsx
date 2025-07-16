@@ -98,6 +98,13 @@ const ProfileScreen = () => {
         {/* Remove sessions, rank, achievements logic */}
 
         <GlassCard style={styles.menuSection}>
+          <TouchableOpacity 
+            style={styles.menuItem} 
+            onPress={() => navigation.navigate('Analytics' as any)}
+          >
+            <Icon name="bar-chart" size={22} color="#764ba2" style={styles.menuIcon} />
+            <Text style={styles.menuText}>Analytics</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuPress('settings')}>
             <Icon name="settings" size={22} color="#764ba2" style={styles.menuIcon} />
             <Text style={styles.menuText}>Settings</Text>
