@@ -186,12 +186,12 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
               </View>
 
               <ValidatedEmailInput
-                value={email}
-                onChangeText={setEmail}
+                    value={email}
+                    onChangeText={setEmail}
                 onValidationChange={setIsEmailValid}
-                placeholder="Enter your email"
+                    placeholder="Enter your email"
                 label="Email"
-              />
+                  />
 
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Password</Text>

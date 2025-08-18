@@ -3,6 +3,7 @@ import authReducer from './authSlice';
 import sessionsReducer from './sessionsSlice';
 import analyticsReducer from './analyticsSlice';
 import weatherReducer from './weatherSlice';
+import trainingReducer from './trainingSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     sessions: sessionsReducer,
     analytics: analyticsReducer,
     weather: weatherReducer,
+    training: trainingReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

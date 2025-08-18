@@ -240,23 +240,23 @@ export const AnalyticsScreen: React.FC = () => {
             {periodOptions.map((option, idx) => {
               const isActive = selectedPeriod === option.value || (!selectedPeriod && !option.value);
               return (
-                <TouchableOpacity
-                  key={option.label}
-                  activeOpacity={0.85}
+              <TouchableOpacity
+                key={option.label}
+                activeOpacity={0.85}
                   style={[
                     styles.periodButtonPolished,
                     isActive && styles.periodButtonPolishedActive,
                     idx !== periodOptions.length - 1 && { marginRight: 16 },
                   ]}
-                  onPress={() => handlePeriodChange(option.value as PeriodType)}
-                >
+                onPress={() => handlePeriodChange(option.value as PeriodType)}
+              >
                   <Text style={[
                     styles.periodButtonPolishedText,
                     isActive && styles.periodButtonPolishedTextActive,
                   ]}>
                     {option.label}
                   </Text>
-                </TouchableOpacity>
+              </TouchableOpacity>
               );
             })}
           </ScrollView>
@@ -345,11 +345,11 @@ export const AnalyticsScreen: React.FC = () => {
                     </View>
                   ))
                 : Object.entries(highestGrades).map(([discipline, grade], index) => (
-                    <View key={index} style={styles.bestItem}>
+                <View key={index} style={styles.bestItem}>
                       <Text style={styles.bestLabel}>{prettyDisciplineName(discipline)}</Text>
                       <Text style={[styles.bestValue, { color: getGradeColor(formatBackendGrade(grade as string, discipline)) }]}>{formatBackendGrade(grade as string, discipline)}</Text>
-                    </View>
-                  ))
+                </View>
+              ))
             ) : (
               <Text style={styles.emptyText}>No grade data available</Text>
             )}

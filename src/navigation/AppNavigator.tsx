@@ -22,6 +22,8 @@ import { AnalyticsScreen } from '../screens/analytics/AnalyticsScreen';
 import WeatherScreen from '../screens/weather/WeatherScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import AchievementsScreen from '../screens/profile/AchievementsScreen';
+import TrainingScreen from '../screens/training/TrainingScreen';
+import TrainingPlanDetailScreen from '../screens/training/TrainingPlanDetailScreen';
 import PrivacyPolicy from '../components/PrivacyPolicy';
 import TermsOfService from '../components/TermsOfService';
 
@@ -77,12 +79,22 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Analytics"
-        component={AnalyticsScreen}
+        name="Training"
+        component={TrainingScreen}
         options={{
-          tabBarLabel: 'Analytics',
+          tabBarLabel: 'Training',
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="bar-chart" color={color} size={size} />
+            <TabIcon name="fitness-center" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Achievements"
+        component={AchievementsScreen}
+        options={{
+          tabBarLabel: 'Awards',
+          tabBarIcon: ({ color, size }) => (
+            <TabIcon name="emoji-events" color={color} size={size} />
           ),
         }}
       />
@@ -93,16 +105,6 @@ const TabNavigator = () => {
           tabBarLabel: 'Profile',
           tabBarIcon: ({ color, size }) => (
             <TabIcon name="person" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Achievements"
-        component={AchievementsScreen}
-        options={{
-          tabBarLabel: 'Awards',
-          tabBarIcon: ({ color, size }) => (
-            <TabIcon name="trophy" color={color} size={size} />
           ),
         }}
       />
@@ -118,7 +120,8 @@ const TabIcon = ({ name, color, size }: { name: string; color: string; size: num
       case 'weather': return 'wb-sunny';
       case 'bar-chart': return 'bar-chart';
       case 'person': return 'person';
-      case 'trophy': return 'emoji-events';
+      case 'fitness-center': return 'fitness-center';
+      case 'emoji-events': return 'emoji-events';
       default: return 'help';
     }
   };
@@ -151,7 +154,7 @@ const AppNavigator = () => {
           try {
             console.log('🔍 Validating existing token...');
             // Use validateToken instead of getCurrentUser for initial check
-            dispatch(validateToken());
+        dispatch(validateToken());
           } catch (error) {
             console.log('❌ Token validation failed, user needs to login again');
             // Clear any stale token
@@ -214,6 +217,30 @@ const AppNavigator = () => {
               options={{
                 headerShown: true,
                 title: 'Edit Session',
+                headerStyle: {
+                  backgroundColor: '#6366f1',
+                },
+                headerTintColor: '#ffffff',
+              }}
+            />
+            <Stack.Screen
+              name="Analytics"
+              component={AnalyticsScreen}
+              options={{
+                headerShown: true,
+                title: 'Analytics',
+                headerStyle: {
+                  backgroundColor: '#6366f1',
+                },
+                headerTintColor: '#ffffff',
+              }}
+            />
+            <Stack.Screen
+              name="TrainingPlanDetail"
+              component={TrainingPlanDetailScreen}
+              options={{
+                headerShown: true,
+                title: 'Plan Details',
                 headerStyle: {
                   backgroundColor: '#6366f1',
                 },

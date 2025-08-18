@@ -20,7 +20,17 @@ import {
   ClimbingDiscipline,
   Grade,
   ApiResponse,
-  PaginatedResponse
+  PaginatedResponse,
+  TrainingPlanTemplate,
+  UserTrainingPlan,
+  TrainingProgress,
+  StartTrainingPlanRequest,
+  CompleteSessionRequest,
+  TrainingTemplatesResponse,
+  UserTrainingPlansResponse,
+  UserTrainingPlanResponse,
+  TrainingProgressResponse,
+  TrainingPlanFilters
 } from '../types';
 import { EXPO_PUBLIC_BACKEND_API_URL } from '@env';
 
@@ -326,6 +336,94 @@ class ApiService {
   async getAverageGrades(period?: 'week' | 'month' | 'year'): Promise<AverageGradeStats[]> {
     const endpoint = period ? `/sessions/stats/average?period=${period}` : '/sessions/stats/average';
     return this.request<AverageGradeStats[]>(endpoint);
+  }
+
+  // Training Plan Endpoints
+  async getTrainingTemplates(filters?: TrainingPlanFilters): Promise<TrainingPlanTemplate[]> {
+    let endpoint = '/training/templates';
+    const params = new URLSearchParams();
+    
+    if (filters?.difficulty) {
+      params.append('difficulty', filters.difficulty);
+    }
+    if (filters?.category) {
+      params.append('category', filters.category);
+    }
+    
+    if (params.toString()) {
+      endpoint += `?${params.toString()}`;
+    }
+    
+    const response = await this.request<any>(endpoint);
+    // Handle both array and { data: array } formats
+    return Array.isArray(response) ? response : (response.data || []);
+  }
+
+  async startTrainingPlan(request: StartTrainingPlanRequest): Promise<UserTrainingPlan> {
+    // Ensure templateId is sent as a string
+    const payload = {
+      templateId: String(request.templateId)
+    };
+    
+    console.log('🚀 Starting training plan with payload:', payload);
+    
+    const response = await this.request<UserTrainingPlanResponse>('/training/user-plans', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    
+    // Handle both direct object and { data: object } formats
+    return response.data || response;
+  }
+
+  async getUserTrainingPlans(): Promise<UserTrainingPlan[]> {
+    const response = await this.request<UserTrainingPlansResponse>('/training/user-plans');
+    return response.data || response;
+  }
+
+  async getActiveTrainingPlan(): Promise<UserTrainingPlan | null> {
+    try {
+      const response = await this.request<UserTrainingPlanResponse>('/training/user-plans/active');
+      return response.data || response;
+    } catch (error: any) {
+      if (error.message.includes('No active plan') || error.message.includes('404')) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  async getUserTrainingPlan(planId: string): Promise<UserTrainingPlan> {
+    const response = await this.request<UserTrainingPlanResponse>(`/training/user-plans/${planId}`);
+    return response.data || response;
+  }
+
+  async completeTrainingSession(planId: string, sessionId: string, duration?: number, notes?: string): Promise<{ message: string }> {
+    const payload: any = {};
+    if (duration !== undefined) payload.duration = duration;
+    if (notes !== undefined) payload.notes = notes;
+    
+    return this.request<{ message: string }>(`/training/user-plans/${planId}/sessions/${sessionId}/complete`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async pauseTrainingPlan(planId: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`/training/user-plans/${planId}/pause`, {
+      method: 'POST',
+    });
+  }
+
+  async resumeTrainingPlan(planId: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`/training/user-plans/${planId}/resume`, {
+      method: 'POST',
+    });
+  }
+
+  async getTrainingProgress(planId: string): Promise<TrainingProgress> {
+    const response = await this.request<TrainingProgressResponse>(`/training/user-plans/${planId}/progress`);
+    return response.data || response;
   }
 }
 

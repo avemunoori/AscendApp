@@ -127,11 +127,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               <Text style={styles.formTitle}>Welcome Back</Text>
               
               <ValidatedEmailInput
-                value={email}
-                onChangeText={setEmail}
-                placeholder="Enter your email"
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholder="Enter your email"
                 label="Email"
-              />
+                  />
 
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Password</Text>
