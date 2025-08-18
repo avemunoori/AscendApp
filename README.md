@@ -140,19 +140,12 @@ npm run android
 ### Environment Setup
 Create a `.env` file in the root directory:
 ```
-EXPO_PUBLIC_BACKEND_API_URL=https://ascend-api-production.up.railway.app
+EXPO_PUBLIC_BACKEND_API_URL=your_backend_api_url_here
 ```
 
-## 📊 Test Account
+## 📊 Testing
 
-For testing purposes, you can use:
-- **Email**: `avemunoori@gmail.com`
-- **Password**: `Aaryan@123abc`
-
-This account includes:
-- 14 climbing sessions with realistic progression
-- 2 training plans (1 active, 1 paused)
-- Comprehensive analytics data
+For testing purposes, create your own account or use the demo data provided in the app.
 
 ## 🏗️ Project Structure
 

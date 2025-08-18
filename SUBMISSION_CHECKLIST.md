@@ -72,8 +72,7 @@
 - [x] Analytics data for testing
 
 ### **Test Account**
-- [x] Email: `avemunoori@gmail.com`
-- [x] Password: `Aaryan@123abc`
+- [x] Demo account available
 - [x] Rich session history
 - [x] Training plan data
 - [x] Analytics metrics
