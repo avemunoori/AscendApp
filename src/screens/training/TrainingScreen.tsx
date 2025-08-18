@@ -87,7 +87,6 @@ const TrainingScreen: React.FC = () => {
   const [scaleAnim] = useState(new Animated.Value(1));
 
   useEffect(() => {
-    console.log('🔧 TrainingScreen: Fetching templates...');
     loadTrainingData();
   }, [dispatch]);
 

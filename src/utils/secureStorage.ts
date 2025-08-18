@@ -8,7 +8,6 @@ export class SecureStorage {
   static async storeToken(token: string): Promise<void> {
     try {
       await SecureStore.setItemAsync(TOKEN_KEY, token);
-      console.log('🔐 Token stored securely');
     } catch (error) {
       console.error('❌ Failed to store token securely:', error);
       throw new Error('Failed to store authentication token');
@@ -30,7 +29,6 @@ export class SecureStorage {
   static async removeToken(): Promise<void> {
     try {
       await SecureStore.deleteItemAsync(TOKEN_KEY);
-      console.log('🔐 Token removed from secure storage');
     } catch (error) {
       console.error('❌ Failed to remove token:', error);
     }
@@ -40,7 +38,6 @@ export class SecureStorage {
   static async storeUser(user: any): Promise<void> {
     try {
       await SecureStore.setItemAsync(USER_KEY, JSON.stringify(user));
-      console.log('🔐 User data stored securely');
     } catch (error) {
       console.error('❌ Failed to store user data:', error);
     }
@@ -61,7 +58,6 @@ export class SecureStorage {
   static async removeUser(): Promise<void> {
     try {
       await SecureStore.deleteItemAsync(USER_KEY);
-      console.log('🔐 User data removed from secure storage');
     } catch (error) {
       console.error('❌ Failed to remove user data:', error);
     }
@@ -74,7 +70,6 @@ export class SecureStorage {
         this.removeToken(),
         this.removeUser()
       ]);
-      console.log('🔐 All auth data cleared from secure storage');
     } catch (error) {
       console.error('❌ Failed to clear auth data:', error);
     }

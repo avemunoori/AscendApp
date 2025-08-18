@@ -141,27 +141,21 @@ const AppNavigator = () => {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        console.log('🚀 Starting app initialization...');
         // Set dispatch function in API service
         apiService.setDispatch(dispatch);
         await apiService.initialize();
         
         // Only try to validate token if we have one
         const token = await apiService.getToken();
-        console.log('🔑 Token check result:', token ? 'Token found' : 'No token');
         
         if (token) {
           try {
-            console.log('🔍 Validating existing token...');
             // Use validateToken instead of getCurrentUser for initial check
         dispatch(validateToken());
           } catch (error) {
-            console.log('❌ Token validation failed, user needs to login again');
             // Clear any stale token
             dispatch(logout());
           }
-        } else {
-          console.log('ℹ️ No token found, user needs to login');
         }
       } catch (error) {
         console.error('❌ Failed to initialize app:', error);

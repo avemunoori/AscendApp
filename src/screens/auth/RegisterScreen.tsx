@@ -84,7 +84,6 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
     try {
       await dispatch(register({ firstName, lastName, email, password })).unwrap();
     } catch (error: any) {
-      console.log('Registration error:', error);
       let errorMessage = 'Registration failed. Please try again.';
       
       if (error.message) {

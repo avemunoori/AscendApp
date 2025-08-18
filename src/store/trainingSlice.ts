@@ -81,10 +81,8 @@ export const startTrainingPlan = createAsyncThunk(
   'training/startTrainingPlan',
   async (templateId: string, { rejectWithValue }) => {
     try {
-      console.log('🚀 Starting training plan with templateId:', templateId);
       const request: StartTrainingPlanRequest = { templateId: String(templateId) };
       const userPlan = await apiService.startTrainingPlan(request);
-      console.log('✅ Training plan started successfully:', userPlan);
       return userPlan;
     } catch (error: any) {
       console.error('❌ Failed to start training plan:', error);

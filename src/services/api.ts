@@ -37,9 +37,7 @@ import { EXPO_PUBLIC_BACKEND_API_URL } from '@env';
 // API Configuration
 const API_BASE_URL = EXPO_PUBLIC_BACKEND_API_URL;
 
-console.log('🔧 API Configuration:');
-console.log('🔧 EXPO_PUBLIC_BACKEND_API_URL:', EXPO_PUBLIC_BACKEND_API_URL);
-console.log('🔧 API_BASE_URL:', API_BASE_URL);
+    // API Configuration loaded
 
 if (!API_BASE_URL) {
   throw new Error('EXPO_PUBLIC_BACKEND_API_URL environment variable is required');
@@ -56,9 +54,8 @@ class ApiService {
 
   // Initialize token from storage
   async initialize() {
-    console.log('🔧 Initializing API service...');
+    // Initializing API service...
     this.token = await SecureStorage.getToken();
-    console.log('🔧 Token from secure storage:', this.token ? 'Found' : 'Not found');
   }
 
   // Get current token
@@ -116,8 +113,7 @@ class ApiService {
       ...options,
     };
 
-    console.log('🌐 Making API request to:', url);
-    console.log('📋 Request config:', { method: config.method || 'GET', headers: config.headers });
+    // Making API request
 
     try {
       const response = await fetch(url, config);
@@ -364,8 +360,6 @@ class ApiService {
     const payload = {
       templateId: String(request.templateId)
     };
-    
-    console.log('🚀 Starting training plan with payload:', payload);
     
     const response = await this.request<UserTrainingPlanResponse>('/training/user-plans', {
       method: 'POST',

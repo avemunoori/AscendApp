@@ -14,18 +14,13 @@ declare global {
 export default function App() {
   useEffect(() => {
     const handleDeepLink = (event: { url: string }) => {
-      console.log('🔗 Deep link received:', event.url);
-      
       try {
         const url = event.url;
         const { path, queryParams } = Linking.parse(url);
         
-        console.log('🔗 Parsed deep link:', { path, queryParams });
-        
         if (path === 'reset-password' && queryParams?.code) {
           // Navigate to password reset screen with the code
           // We'll handle this in the navigation
-          console.log('🔗 Password reset deep link detected with code:', queryParams.code);
           
           // Store the reset code temporarily for the navigation to pick up
           global.resetPasswordCode = queryParams.code as string;
@@ -48,7 +43,6 @@ export default function App() {
     // Handle app launch from a deep link
     Linking.getInitialURL().then((url: string | null) => {
       if (url) {
-        console.log('🔗 App launched from deep link:', url);
         handleDeepLink({ url });
       }
     });

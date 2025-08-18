@@ -41,7 +41,6 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation,
   useEffect(() => {
     // Check if we have a reset code from deep link
     if (global.resetPasswordCode) {
-      console.log('🔗 Found reset code from deep link:', global.resetPasswordCode);
       setResetCode(global.resetPasswordCode);
       setStep('code');
       // Clear the global code after using it
@@ -50,7 +49,6 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation,
     
     // Check if we have a reset code from route params
     if (route.params?.resetCode) {
-      console.log('🔗 Found reset code from route params:', route.params.resetCode);
       setResetCode(route.params.resetCode);
       setStep('code');
     }
