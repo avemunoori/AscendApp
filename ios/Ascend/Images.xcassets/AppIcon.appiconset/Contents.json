@@ -76,6 +76,83 @@
       "platform": "ios",
       "scale": "1x",
       "size": "1024x1024"
+    },
+    {
+      "filename": "AscendLogo.png",
+      "idiom": "ipad",
+      "platform": "ios",
+      "scale": "1x",
+      "size": "20x20"
+    },
+    {
+      "filename": "AscendLogo.png",
+      "idiom": "ipad",
+      "platform": "ios",
+      "scale": "2x",
+      "size": "20x20"
+    },
+    {
+      "filename": "AscendLogo.png",
+      "idiom": "ipad",
+      "platform": "ios",
+      "scale": "1x",
+      "size": "29x29"
+    },
+    {
+      "filename": "AscendLogo.png",
+      "idiom": "ipad",
+      "platform": "ios",
+      "scale": "2x",
+      "size": "29x29"
+    },
+    {
+      "filename": "AscendLogo.png",
+      "idiom": "ipad",
+      "platform": "ios",
+      "scale": "1x",
+      "size": "40x40"
+    },
+    {
+      "filename": "AscendLogo.png",
+      "idiom": "ipad",
+      "platform": "ios",
+      "scale": "2x",
+      "size": "40x40"
+    },
+    {
+      "filename": "AscendLogo.png",
+      "idiom": "ipad",
+      "platform": "ios",
+      "scale": "1x",
+      "size": "76x76"
+    },
+    {
+      "filename": "AscendLogo.png",
+      "idiom": "ipad",
+      "platform": "ios",
+      "scale": "2x",
+      "size": "76x76"
+    },
+    {
+      "filename": "AscendLogo.png",
+      "idiom": "ipad",
+      "platform": "ios",
+      "scale": "1x",
+      "size": "83.5x83.5"
+    },
+    {
+      "filename": "AscendLogo.png",
+      "idiom": "ipad",
+      "platform": "ios",
+      "scale": "2x",
+      "size": "83.5x83.5"
+    },
+    {
+      "filename": "AscendLogo.png",
+      "idiom": "ipad",
+      "platform": "ios",
+      "scale": "1x",
+      "size": "1024x1024"
     }
   ],
   "info": {
